@@ -2,8 +2,7 @@ name: Fetch MSN News Links
 
 on:
   schedule:
-    - cron: '45 16 * * *'  # UTC 16:00 → 北京时间 00:00
-    - cron: '45 4 * * *'   # UTC 04:00 → 北京时间 12:00
+    - cron: '58 4,16 * * *'  # UTC 16:00 → 北京时间 00:00
 
   workflow_dispatch:  # 允许手动触发
 
@@ -15,12 +14,6 @@ jobs:
     permissions:
       contents: write  # 赋予写入权限
     steps:
-      - name: Print current system time
-        run: date
-      - name: Print current UTC time
-        run: date -u
-      - name: Your task
-        run: echo "This is your task."   
       - name: Checkout repository
         uses: actions/checkout@v3
 
