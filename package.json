@@ -1,0 +1,23 @@
+{
+  "name": "msnnewslink",
+  "version": "1.0.0",
+  "description": "GitHub Action to fetch MSN news links containing ar-A",
+  "main": ".github/scripts/fetch_msn_news.js",
+  "scripts": {
+    "fetch": "node .github/scripts/fetch_msn_news.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "msn",
+    "news",
+    "github-actions"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "fs": "0.0.1-security",
+    "nodemailer": "^6.9.7",
+    "path": "^0.12.7"
+  }
+}
