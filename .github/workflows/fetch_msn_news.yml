@@ -8,6 +8,8 @@ on:
 jobs:
   fetch-news:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 赋予写入权限
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -27,10 +29,16 @@ jobs:
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: node .github/scripts/fetch_msn_news.js
 
-      - name: Commit and push if changed
+      - name: Commit and push changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git add links.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update MSN news links"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update links.json"
+            # 使用普通的 git pull 并自动合并更改
+            git pull origin main --no-edit
+            git push origin main
+          fi
