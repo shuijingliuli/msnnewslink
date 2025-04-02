@@ -2,7 +2,7 @@ name: Fetch MSN News Links
 
 on:
   schedule:
-    - cron: '25 4 * * *'   # UTC 04:00 → 北京时间 12:00
+    - cron: '29 12 * * *'   # UTC 04:00 → 北京时间 12:00
     - cron: '25 16 * * *'  # UTC 16:00 → 北京时间 00:00
 
   workflow_dispatch:  # 允许手动触发
