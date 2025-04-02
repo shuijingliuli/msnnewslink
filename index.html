@@ -410,7 +410,7 @@
         // 在新窗口打开链接
         function openLink(url) {
             // 在新窗口打开链接
-            window.open(url, '_blank');
+            window.location.href = url;
             
             // 将链接添加到已访问列表
             if (!visitedLinks.some(item => item.url === url)) {
