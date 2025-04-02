@@ -1,13 +1,10 @@
 name: Fetch MSN News Links
 
 on:
-  push:
-    branches: [main]  # 触发分支
-  pull_request:
-    branches: [main]
   schedule:
-    - cron: '5 16 * * *'  # UTC 16:00 → 北京时间 00:00
-    - cron: '5 4 * * *'   # UTC 04:00 → 北京时间 12:00
+    - cron: '25 4 * * *'   # UTC 04:00 → 北京时间 12:00
+    - cron: '25 16 * * *'  # UTC 16:00 → 北京时间 00:00
+
   workflow_dispatch:  # 允许手动触发
 
   
