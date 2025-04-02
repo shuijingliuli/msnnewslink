@@ -242,7 +242,7 @@ async function fetchMsnNews() {
       }, null, 2));
       
       console.log(`结果已保存到 ${outputPath}，使用北京时间：${getBeijingTime()}`);
-      
+      await sendErrorEmail(lastError ? lastError.message : '未知错误');//邮件debug
       // 成功获取数据，退出循环
       return;
       
