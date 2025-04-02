@@ -172,7 +172,7 @@ function generateHeaders() {
     'APP_ANON=A=B1471EC7882B01B553737A98FFFFFFFF',
     `MUID=${muid}`,
     'msnup=%7B%22cnex%22%3A%22no%22%7D',
-    'aace=%7b%22child%22%3a0%2c%22expiredOn%22%3a%222025-09-24T07%3a43%3a47%22%7d',
+    'aace=%7b%22child%22%3a0%2c%22expiredOn%22%3a%223025-09-24T07%3a43%3a47%22%7d',
     'els=%7b%22account_type%22%3a%22MSA%22%7d'
   ].join('; ');
   
@@ -281,12 +281,3 @@ async function fetchMsnNews() {
 if (require.main === module) {
   fetchMsnNews();
 }
-
-// 导出函数以便测试
-module.exports = {
-  fetchMsnNews,
-  generateRequestUrl,
-  generateHeaders,
-  extractArAUrls,
-  getBeijingTime
-};
