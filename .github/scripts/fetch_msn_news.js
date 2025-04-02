@@ -235,7 +235,7 @@ async function fetchMsnNews() {
       console.log(`找到 ${arAUrls.length} 个包含 'ar-A' 的URL，已为每隔一个URL添加参数`);
       
       // 保存结果到JSON文件
-      const outputPath = path.join(process.cwd(), 'msn_news_links.json');
+      const outputPath = path.join(process.cwd(), 'links.json');
       fs.writeFileSync(outputPath, JSON.stringify({
         timestamp: getBeijingTime(), // 使用北京时间
         urls: arAUrls
