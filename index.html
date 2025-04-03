@@ -441,11 +441,6 @@
         function removeVisitedLink(url) {
             visitedLinks = visitedLinks.filter(item => item.url !== url);
             
-            // 将链接重新添加到可用链接
-            if (!availableLinks.includes(url)) {
-                availableLinks.push(url);
-            }
-            
             // 更新UI和本地存储
             saveToLocalStorage();
             updateUI();
@@ -453,12 +448,6 @@
         
         // 清空所有已访问的链接
         function clearVisitedLinks() {
-            // 将所有已访问链接重新添加到可用链接
-            visitedLinks.forEach(item => {
-                if (!availableLinks.includes(item.url)) {
-                    availableLinks.push(item.url);
-                }
-            });
             
             // 清空已访问链接
             visitedLinks = [];
