@@ -2,7 +2,7 @@ name: Fetch MSN News Links
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # 每两小时更新一次
+    - cron: '15 16,20 * * *'  # 换成UTC+8是0点和凌晨4点
   workflow_dispatch:  # 允许手动触发
 
   
