@@ -62,6 +62,30 @@
         let availableLinks = [];
         let visitedLinks = [];
         
+        // 从URL中提取新闻标题
+        function extractTitleFromUrl(url) {
+            try {
+                // MSN新闻链接格式：https://www.msn.cn/zh-cn/news/other/[标题]/ar-[ID]
+                const urlObj = new URL(url);
+                const pathParts = urlObj.pathname.split('/');
+                
+                // 获取标题部分（通常是倒数第二个部分）
+                let title = '';
+                if (pathParts.length >= 2) {
+                    title = pathParts[pathParts.length - 2];
+                    // 将URL编码的标题转换回中文
+                    title = decodeURIComponent(title);
+                    // 替换所有的连字符为空格
+                    title = title.replace(/-/g, ' ');
+                }
+                
+                return title || '无标题';
+            } catch (error) {
+                console.error('提取标题失败:', error);
+                return '无法解析标题';
+            }
+        }
+        
         // DOM元素
         const statusDiv = document.getElementById('status');
         const loadingDiv = document.getElementById('loading');
@@ -189,8 +213,10 @@
                 availableLinks.forEach((link, index) => {
                     const linkItem = document.createElement('div');
                     linkItem.className = 'link-item';
-                    linkItem.textContent = `${index + 1}. ${link}`;
-                    linkItem.title = link;
+                    // 提取并显示标题而不是完整链接
+                    const title = extractTitleFromUrl(link);
+                    linkItem.textContent = `${index + 1}. ${title}`;
+                    linkItem.title = link; // 保留完整链接作为提示
                     linkItem.addEventListener('click', () => openLink(link));
                     linksListDiv.appendChild(linkItem);
                 });
@@ -206,10 +232,11 @@
                     visitedItem.className = 'visited-item';
                     
                     const linkSpan = document.createElement('span');
-                    linkSpan.className = 'link';
-                    linkSpan.textContent = `${index + 1}. ${item.url}`;
-                    linkSpan.title = item.url;
-                    linkSpan.addEventListener('click', () => openLink(item.url));
+                    linkSpan.className = 'link visited-link';
+                    // 提取并显示标题而不是完整链接
+                    const title = extractTitleFromUrl(item.url);
+                    linkSpan.textContent = `${index + 1}. ${title}`;
+                    linkSpan.title = item.url + ' (已访问)'; // 保留完整链接作为提示，并标记为已访问
                     
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'delete-btn';
