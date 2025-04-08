@@ -120,6 +120,14 @@ header {
     margin-right: 10px;
 }
 
+.visited-link {
+    cursor: default;
+    color: #666;
+    text-decoration: none;
+    pointer-events: none; /* 禁用鼠标事件 */
+    opacity: 0.8; /* 稍微降低不透明度 */
+}
+
 .visited-item .delete-btn {
     background-color: #d9534f;
     color: white;
