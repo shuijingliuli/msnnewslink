@@ -107,14 +107,34 @@
             // 从本地存储加载数据
             loadFromLocalStorage();
             
-            // 如果本地没有数据或数据过期，则从API获取
-            if (availableLinks.length === 0) {
+            // 检查是否需要获取新链接
+            const needFetchNewLinks = await checkNeedFetchNewLinks();
+            
+            // 如果本地没有数据、数据过期或者链接不是今天的，则从API获取
+            if (availableLinks.length === 0 || needFetchNewLinks) {
                 await fetchLinks();
             } else {
                 updateUI();
             }
             
             setupEventListeners();
+        }
+        
+        // 检查是否需要获取新链接
+        async function checkNeedFetchNewLinks() {
+            // 如果没有链接，需要获取
+            if (availableLinks.length === 0) return true;
+            
+            // 获取当前存储的更新时间
+            const storedLastUpdate = localStorage.getItem(STORAGE_KEYS.LAST_UPDATE);
+            if (!storedLastUpdate) return true;
+            
+            // 检查日期是否为今天
+            const todayString = getTodayDateString();
+            const storedDateString = getDateStringFromTimestamp(storedLastUpdate);
+            
+            // 如果存储的日期不是今天，需要获取新链接
+            return storedDateString !== todayString;
         }
         
         // 从本地存储加载数据
@@ -151,8 +171,42 @@
             }
         }
         
+        // 获取今天的日期字符串（格式：YYYY-MM-DD）
+        function getTodayDateString() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 从时间戳中提取日期字符串
+        function getDateStringFromTimestamp(timestamp) {
+            if (!timestamp) return '';
+            try {
+                // 尝试解析时间戳
+                const date = new Date(timestamp);
+                if (isNaN(date.getTime())) {
+                    // 如果无法解析为日期，尝试从字符串中提取日期部分
+                    const dateMatch = timestamp.match(/(\d{4})[-年](\d{1,2})[-月](\d{1,2})/); 
+                    if (dateMatch) {
+                        return `${dateMatch[1]}-${String(dateMatch[2]).padStart(2, '0')}-${String(dateMatch[3]).padStart(2, '0')}`;
+                    }
+                    return '';
+                }
+                
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            } catch (e) {
+                console.error('解析时间戳失败:', e);
+                return '';
+            }
+        }
+        
         // 从本地JSON文件获取链接
-        async function fetchLinks() {
+        async function fetchLinks(retryCount = 0, maxRetries = 30) {
             statusDiv.innerHTML = '<p>状态: 正在获取链接...</p>';
             loadingDiv.textContent = '正在获取新闻链接...';
             
@@ -175,6 +229,20 @@
                     timestamp = data.timestamp || '';
                 }
                 
+                // 检查链接日期是否为今天
+                const todayString = getTodayDateString();
+                const linkDateString = getDateStringFromTimestamp(timestamp);
+                
+                // 如果链接不是今天的且重试次数未达到上限，则重新获取
+                if (linkDateString !== todayString && retryCount < maxRetries) {
+                    console.log(`链接日期 ${linkDateString} 不是今天 ${todayString}，尝试重新获取（${retryCount + 1}/${maxRetries}）`);
+                    statusDiv.innerHTML = `<p>状态: 链接不是今天的，正在重新获取（${retryCount + 1}/${maxRetries}）...</p>`;
+                    
+                    // 等待一秒后重试
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return fetchLinks(retryCount + 1, maxRetries);
+                }
+                
                 // 去重并过滤掉已访问的链接
                 const uniqueLinks = [...new Set(allLinks)];
                 availableLinks = uniqueLinks.filter(link => !visitedLinks.some(visited => visited.url === link));
@@ -186,12 +254,36 @@
                 
                 if (availableLinks.length > 0) {
                     enableControls();
+                    
+                    // 显示链接日期信息
+                    if (linkDateString === todayString) {
+                        statusDiv.innerHTML = `<p>状态: 已加载今天 (${todayString}) 的链接</p>
+                            <p>可用链接: <span id="available-links">${availableLinks.length}</span> 条</p>
+                            <p>已访问链接: <span id="visited-links">${visitedLinks.length}</span> 条</p>
+                            <p>最后更新: <span id="last-update">${lastUpdateSpan.textContent}</span></p>`;
+                    } else {
+                        statusDiv.innerHTML = `<p>状态: 已加载链接（非今日更新）</p>
+                            <p>可用链接: <span id="available-links">${availableLinks.length}</span> 条</p>
+                            <p>已访问链接: <span id="visited-links">${visitedLinks.length}</span> 条</p>
+                            <p>最后更新: <span id="last-update">${lastUpdateSpan.textContent}</span></p>`;
+                    }
                 } else {
                     statusDiv.innerHTML = '<p>状态: 未找到链接</p>';
                     loadingDiv.textContent = '未找到任何新闻链接';
                 }
             } catch (error) {
                 console.error('获取链接失败:', error);
+                
+                // 如果获取失败且重试次数未达到上限，则重新获取
+                if (retryCount < maxRetries) {
+                    statusDiv.innerHTML = `<p>状态: 获取链接失败，正在重试（${retryCount + 1}/${maxRetries}）...</p>`;
+                    console.log(`获取链接失败，正在重试（${retryCount + 1}/${maxRetries}）...`);
+                    
+                    // 等待一秒后重试
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return fetchLinks(retryCount + 1, maxRetries);
+                }
+                
                 statusDiv.innerHTML = `<p>状态: 获取链接失败 - ${error.message}</p>`;
                 loadingDiv.textContent = '获取本地链接文件失败，请检查links.json文件是否存在';
             }
