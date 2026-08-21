@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务JSON生成器</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        button:hover { background: #1d4ed8; }
+        button.secondary { background: #6b7280; }
+        button.secondary:hover { background: #4b5563; }
+        button.success { background: #059669; }
+        button.success:hover { background: #047857; }
+        button.danger { background: #dc2626; }
+        button.danger:hover { background: #b91c1c; }
+
+        .step-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .step-item:last-child { border-bottom: none; }
+        .step-index {
+            width: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        .step-type {
+            width: 120px;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .step-value {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .step-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .step-actions button {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .json-preview {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 16px;
+        }
+        .json-preview h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            resize: vertical;
+            background: #f9fafb;
+        }
+        .tip {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>脚本猫任务 JSON 生成器</h1>
+
+    <div class="toolbar">
+        <button onclick="addStep()">➕ 添加步骤</button>
+        <button class="secondary" onclick="importJson()">📂 导入已有JSON</button>
+        <button class="secondary" onclick="clearAll()">🗑️ 清空全部</button>
+        <button class="success" onclick="copyJson()">📋 复制JSON</button>
+        <button class="success" onclick="downloadJson()">💾 下载JSON文件</button>
+    </div>
+
+    <div class="step-list" id="stepList"></div>
+
+    <div class="json-preview">
+        <h3>生成的标准JSON</h3>
+        <textarea id="jsonOutput" readonly></textarea>
+        <div class="tip">
+            支持3种操作类型：<br>
+            • openurl：打开指定网址，value填写完整URL<br>
+            • click：XPath点击元素，value填写标准XPath路径<br>
+            • wait：等待延时，value支持数字（秒）、"5s"、"2000ms" 格式
+        </div>
+    </div>
+
+    <script>
+        let steps = [
+            { type: "openurl", value: "https://www.baidu.com" },
+            { type: "click", value: "/html/body/div/div[3]/div[3]/div[1]/div/div[2]/div/div/div[1]/div/div[1]/div[4]/div[1]/div[3" },
+            { type: "wait", value: "5s" },
+            { type: "click", value: "/html/body/div/div[3]/div[4]/div/div[1]/div/div[4]/div[1]/div[1]" }
+        ];
+
+        function render() {
+            const list = document.getElementById('stepList');
+            list.innerHTML = '';
+            
+            steps.forEach((step, index) => {
+                const item = document.createElement('div');
+                item.className = 'step-item';
+                item.innerHTML = `
+                    <div class="step-index">${index + 1}</div>
+                    <select class="step-type" onchange="updateType(${index}, this.value)">
+                        <option value="openurl" ${step.type === 'openurl' ? 'selected' : ''}>openurl 打开网址</option>
+                        <option value="click" ${step.type === 'click' ? 'selected' : ''}>click XPath点击</option>
+                        <option value="wait" ${step.type === 'wait' ? 'selected' : ''}>wait 等待延时</option>
+                    </select>
+                    <input type="text" class="step-value" value="${step.value.replace(/"/g, '&quot;')}" 
+                           onchange="updateValue(${index}, this.value)" placeholder="请输入对应的值">
+                    <div class="step-actions">
+                        <button class="secondary" onclick="moveUp(${index})" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>上移</button>
+                        <button class="secondary" onclick="moveDown(${index})" ${index === steps.length - 1 ? 'disabled style="opacity:0.3"' : ''}>下移</button>
+                        <button class="danger" onclick="deleteStep(${index})">删除</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+
+            updateJsonOutput();
+        }
+
+        function updateJsonOutput() {
+            document.getElementById('jsonOutput').value = JSON.stringify(steps, null, 4);
+        }
+
+        function addStep() {
+            steps.push({ type: "click", value: "" });
+            render();
+        }
+
+        function updateType(index, type) {
+            steps[index].type = type;
+            updateJsonOutput();
+        }
+
+        function updateValue(index, value) {
+            steps[index].value = value;
+            updateJsonOutput();
+        }
+
+        function moveUp(index) {
+            if (index === 0) return;
+            [steps[index - 1], steps[index]] = [steps[index], steps[index - 1]];
+            render();
+        }
+
+        function moveDown(index) {
+            if (index === steps.length - 1) return;
+            [steps[index + 1], steps[index]] = [steps[index], steps[index + 1]];
+            render();
+        }
+
+        function deleteStep(index) {
+            steps.splice(index, 1);
+            render();
+        }
+
+        function clearAll() {
+            if (confirm('确定清空所有步骤吗？')) {
+                steps = [];
+                render();
+            }
+        }
+
+        function copyJson() {
+            const textarea = document.getElementById('jsonOutput');
+            textarea.select();
+            document.execCommand('copy');
+            alert('JSON已复制到剪贴板');
+        }
+
+        function downloadJson() {
+            const blob = new Blob([JSON.stringify(steps, null, 4)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'task.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importJson() {
+            const input = prompt('请粘贴要导入的JSON内容：');
+            if (!input) return;
+            try {
+                const data = JSON.parse(input);
+                if (!Array.isArray(data)) throw new Error('必须是数组格式');
+                if (!data.every(s => s.type && s.value !== undefined)) {
+                    throw new Error('存在格式非法的步骤，必须包含type和value字段');
+                }
+                steps = data;
+                render();
+                alert('导入成功');
+            } catch (e) {
+                alert('导入失败：' + e.message);
+            }
+        }
+
+        // 初始化
+        render();
+    </script>
+</body>
+</html>
