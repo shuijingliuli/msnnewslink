@@ -1,0 +1,18 @@
+[
+    {
+        "type": "openurl",
+        "value": "https://www.baidu.com"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div/div[3]/div[3]/div[1]/div/div[2]/div/div/div[1]/div/div[1]/div[4]/div[1]/div[3"
+    },
+    {
+        "type": "wait",
+        "value": "5s"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div/div[3]/div[4]/div/div[1]/div/div[4]/div[1]/div[1]"
+    }
+]
