@@ -1,18 +1,118 @@
 [
     {
         "type": "openurl",
-        "value": "https://www.baidu.com"
-    },
-    {
-        "type": "click",
-        "value": "/html/body/div/div[3]/div[3]/div[1]/div/div[2]/div/div/div[1]/div/div[1]/div[4]/div[1]/div[5]"
+        "value": "https://rewards.bing.com/dashboard"
     },
     {
         "type": "wait",
-        "value": "5s"
+        "value": "10"
     },
     {
         "type": "click",
-        "value": "/html/body/div/div[3]/div[4]/div/div[1]/div/div[4]/div[1]/div[1]"
+        "value": "/html/body/div[2]/div[2]/div/main/div/button[2]/div/div"
+    },
+    {
+        "type": "wait",
+        "value": "8"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[3]/div/section/div/div[3]/button"
+    },
+    {
+        "type": "wait",
+        "value": "5"
+    },
+    {
+        "type": "openurl",
+        "value": "https://rewards.bing.com/dashboard"
+    },
+    {
+        "type": "wait",
+        "value": "5"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[1]/div"
+    },
+    {
+        "type": "wait",
+        "value": "8"
+    },
+    {
+        "type": "openurl",
+        "value": "https://rewards.bing.com/dashboard"
+    },
+    {
+        "type": "wait",
+        "value": "5"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[2]/div"
+    },
+    {
+        "type": "wait",
+        "value": "8"
+    },
+    {
+        "type": "openurl",
+        "value": "https://rewards.bing.com/dashboard"
+    },
+    {
+        "type": "wait",
+        "value": "5"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[3]/div"
+    },
+    {
+        "type": "wait",
+        "value": "8"
+    },
+    {
+        "type": "openurl",
+        "value": "https://rewards.bing.com/earn"
+    },
+    {
+        "type": "wait",
+        "value": "5"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a/div"
+    },
+    {
+        "type": "wait",
+        "value": "3"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[1]/div[2]/a/span"
+    },
+    {
+        "type": "wait",
+        "value": "3"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[2]/div[2]/a/span"
+    },
+    {
+        "type": "wait",
+        "value": "3"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[3]/div[2]/a/span"
+    },
+    {
+        "type": "wait",
+        "value": "3"
+    },
+    {
+        "type": "click",
+        "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[4]/div[2]/a/span"
     }
 ]
