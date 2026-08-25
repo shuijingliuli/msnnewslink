@@ -1,300 +1,822 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <!-- 仅电脑端使用，移除移动端viewport适配 -->
-    <title>脚本猫任务 JSON 生成器</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f5f7fa;
-            color: #333;
-            padding: 16px 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 22px;
-            margin-bottom: 14px;
-            color: #1f2937;
-        }
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        button {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 5px;
-            background: #2563eb;
-            color: white;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
-        button:hover { background: #1d4ed8; }
-        button.secondary { background: #6b7280; }
-        button.secondary:hover { background: #4b5563; }
-        button.success { background: #059669; }
-        button.success:hover { background: #047857; }
-        button.danger { background: #dc2626; }
-        button.danger:hover { background: #b91c1c; }
-
-        .step-list {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 16px;
-            overflow-y: auto;
-            /* 固定高度，一屏显示更多步骤，电脑端 */
-            max-height: 480px;
-        }
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap:10px;
-            padding:8px 14px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .step-item:last-child { border-bottom: none; }
-
-        .step-index {
-            width:28px;
-            text-align:center;
-            font-weight:600;
-            color:#6b7280;
-            flex-shrink:0;
-        }
-        .step-type {
-            width:130px;
-            padding:4px 6px;
-            border:1px solid #d1d5db;
-            border-radius:4px;
-            font-size:13px;
-            flex-shrink:0;
-        }
-        .step-value {
-            flex:1;
-            padding:4px 8px;
-            border:1px solid #d1d5db;
-            border-radius:4px;
-            font-size:13px;
-            font-family: monospace;
-        }
-        .step-actions {
-            display:flex;
-            gap:4px;
-            flex-shrink:0;
-        }
-        .step-actions button {
-            padding:3px 7px;
-            font-size:11px;
-        }
-
-        .json-preview {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding:14px;
-        }
-        .json-preview h3 {
-            margin-bottom:8px;
-            font-size:16px;
-        }
-        textarea {
-            width:100%;
-            height:220px;
-            padding:10px;
-            border:1px solid #d1d5db;
-            border-radius:6px;
-            font-family: monospace;
-            font-size:12px;
-            resize:vertical;
-            background:#f9fafb;
-        }
-        .tip {
-            margin-top:8px;
-            font-size:12px;
-            color:#6b7280;
-            line-height:1.5;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>云端任务 JSON 编辑器</title>
+<style>
+:root{
+  --bg:#f5f7fb;
+  --card:#fff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#d9dee8;
+  --primary:#2563eb;
+  --primary2:#1d4ed8;
+  --danger:#dc2626;
+  --success:#059669;
+  --shadow:0 8px 28px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.header{
+  position:sticky;top:0;z-index:10;
+  background:rgba(245,247,251,.94);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  max-width:1500px;margin:auto;padding:14px 20px;
+  display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+}
+.title{font-size:20px;font-weight:700}
+.subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--border);background:#fff;color:var(--text);
+  padding:8px 13px;border-radius:8px;
+}
+.btn:hover{background:#f8fafc}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.primary:hover{background:var(--primary2)}
+.btn.danger{color:var(--danger)}
+.btn.success{color:var(--success)}
+.layout{
+  max-width:1500px;margin:18px auto;padding:0 20px;
+  display:grid;grid-template-columns:minmax(0,1.25fr) minmax(380px,.75fr);gap:18px;
+}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.card-head{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.card-title{font-weight:700}
+.card-body{padding:16px}
+.task-list{display:flex;flex-direction:column;gap:10px}
+.task-item{
+  border:1px solid var(--border);border-radius:10px;background:#fff;
+  transition:.15s;
+}
+.task-item.dragging{opacity:.45}
+.task-item.drag-over{border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.12)}
+.task-head{
+  padding:11px 12px;display:flex;align-items:center;gap:10px;
+  background:#f8fafc;border-radius:10px 10px 0 0;
+}
+.drag-handle{cursor:grab;color:#9ca3af;font-size:18px;user-select:none}
+.index-badge{
+  min-width:28px;height:28px;border-radius:50%;display:inline-flex;
+  align-items:center;justify-content:center;background:#e8eefc;color:var(--primary);font-size:12px;font-weight:700;
+}
+.task-type{font-weight:700;flex:1}
+.task-summary{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48%}
+.task-actions{display:flex;gap:5px}
+.icon-btn{
+  width:30px;height:30px;border:1px solid var(--border);background:#fff;border-radius:7px;
+}
+.icon-btn:hover{background:#f1f5f9}
+.icon-btn.danger{color:var(--danger)}
+.task-body{padding:12px;border-top:1px solid var(--border)}
+.empty{
+  border:2px dashed #cbd5e1;border-radius:10px;padding:40px 20px;
+  text-align:center;color:var(--muted)
+}
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.label{font-size:13px;font-weight:600}
+.help{font-size:12px;color:var(--muted)}
+.input,.select,.textarea{
+  width:100%;border:1px solid var(--border);border-radius:8px;background:#fff;padding:9px 10px;
+}
+.textarea{min-height:100px;resize:vertical}
+.locator-list{display:flex;flex-direction:column;gap:8px}
+.locator-row{
+  border:1px solid var(--border);border-radius:8px;padding:10px;background:#fbfdff;
+}
+.locator-top{display:grid;grid-template-columns:120px 1fr auto;gap:8px;align-items:center}
+.row-actions{display:flex;gap:6px}
+.small-btn{
+  padding:6px 9px;border:1px solid var(--border);background:#fff;border-radius:7px;font-size:12px;
+}
+.preview{
+  width:100%;height:calc(100vh - 160px);min-height:500px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+  line-height:1.55;background:#0f172a;color:#e2e8f0;border:0;border-radius:8px;padding:14px;resize:none;
+}
+.status{
+  padding:9px 12px;background:#f8fafc;border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted)
+}
+.modal{
+  position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;
+  align-items:center;justify-content:center;padding:20px;z-index:30;
+}
+.modal.show{display:flex}
+.modal-box{
+  width:min(920px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;
+  box-shadow:0 24px 80px rgba(0,0,0,.2);
+}
+.modal-head,.modal-foot{padding:14px 16px;border-bottom:1px solid var(--border)}
+.modal-foot{border-top:1px solid var(--border);border-bottom:0;display:flex;justify-content:flex-end;gap:8px}
+.modal-body{padding:16px}
+.close{font-size:20px;border:0;background:transparent}
+.toast{
+  position:fixed;right:18px;bottom:18px;z-index:50;
+  background:#111827;color:#fff;padding:10px 14px;border-radius:8px;
+  opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:1050px){
+  .layout{grid-template-columns:1fr}
+  .preview{height:420px;min-height:0}
+}
+@media(max-width:650px){
+  .layout{padding:0 10px;margin-top:10px}
+  .header-inner{padding:10px}
+  .editor-grid{grid-template-columns:1fr}
+  .task-summary{display:none}
+  .locator-top{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-    <h1>脚本猫任务 JSON 生成器</h1>
+
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="title">云端任务 JSON 编辑器</div>
+      <div class="subtitle">纯本地运行 · 无需服务器 · 支持导入 / 编辑 / 拖拽排序 / 导出</div>
+    </div>
     <div class="toolbar">
-        <button onclick="addStep()">➕ 添加步骤</button>
-        <button class="secondary" onclick="importJson()">📂 导入已有JSON</button>
-        <button class="secondary" onclick="clearAll()">🗑️ 清空全部</button>
-        <button class="success" onclick="copyJson()">📋 复制JSON</button>
-        <button class="success" onclick="downloadJson()">💾 下载JSON文件</button>
+      <button class="btn" id="newBtn">新建</button>
+      <button class="btn" id="sampleBtn">加载示例</button>
+      <button class="btn" id="importBtn">导入 JSON</button>
+      <button class="btn primary" id="exportBtn">导出 task.json</button>
     </div>
-    <div class="step-list" id="stepList"></div>
-    <div class="json-preview">
-        <h3>生成的标准JSON</h3>
-        <textarea id="jsonOutput" readonly></textarea>
-        <div class="tip">
-            支持3种操作类型：<br>
-            • openurl：打开指定网址，value填写完整URL<br>
-            • click：XPath点击元素，value填写标准XPath路径<br>
-            • wait：等待延时，value支持数字（秒）、"5s"、"2000ms" 格式
+  </div>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">任务步骤</div>
+      <button class="btn primary" id="addBtn">＋ 添加步骤</button>
+    </div>
+    <div class="card-body">
+      <div id="taskList" class="task-list"></div>
+    </div>
+    <div class="status" id="status">共 0 个步骤</div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="card-title">JSON 预览</div>
+      <div>
+        <button class="btn" id="copyBtn">复制 JSON</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <textarea id="preview" class="preview" spellcheck="false" readonly></textarea>
+    </div>
+  </section>
+</main>
+
+<input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong id="modalTitle">添加步骤</strong>
+        <button class="close" id="closeModal">×</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="editor-grid">
+        <div class="field">
+          <label class="label">操作类型</label>
+          <select id="typeInput" class="select">
+            <option value="openurl">openurl · 打开网址</option>
+            <option value="wait">wait · 等待</option>
+            <option value="click">click · 点击</option>
+          </select>
         </div>
+
+        <div class="field" id="valueField">
+          <label class="label" id="valueLabel">value</label>
+          <input id="valueInput" class="input" placeholder="">
+          <div class="help" id="valueHelp"></div>
+        </div>
+
+        <div class="field full" id="locatorField">
+          <label class="label">定位器（按顺序尝试）</label>
+          <div class="help">推荐顺序：css → text → xpath。前面的定位成功后不会继续尝试后面的。</div>
+          <div id="locatorList" class="locator-list"></div>
+          <button class="small-btn" id="addLocatorBtn" style="margin-top:8px">＋ 添加定位器</button>
+        </div>
+
+        <div class="field" id="timeoutField">
+          <label class="label">timeout（秒）</label>
+          <input id="timeoutInput" class="input" type="number" min="1" step="1" value="15">
+        </div>
+
+        <div class="field">
+          <label class="label">说明（可选）</label>
+          <input id="noteInput" class="input" placeholder="例如：点击每日第一个任务">
+        </div>
+      </div>
     </div>
-    <script>
-        // 默认回退数据
-        const defaultSteps = [
-            { type: "openurl", value: "https://www.baidu.com" },
-            { type: "click", value: "/html/body/div/div[3]/div[3]/div[1]/div/div[2]/div/div/div[1]/div/div[1]/div[4]/div[1]/div[3" },
-            { type: "wait", value: "5s" },
-            { type: "click", value: "/html/body/div/div[3]/div[4]/div/div[1]/div/div[4]/div[1]/div[1]" }
-        ];
-        let steps = [];
-        let shouldScrollToLast = false; //标记：添加步骤后是否滚动到最后
+    <div class="modal-foot">
+      <button class="btn" id="cancelModal">取消</button>
+      <button class="btn primary" id="saveModal">保存</button>
+    </div>
+  </div>
+</div>
 
-        // 根据type获取对应placeholder
-        function getPlaceholder(type){
-            switch(type){
-                case "openurl":
-                    return "请输入完整网址，例如：https://xxx.com";
-                case "click":
-                    return "请输入XPath路径，例如：//div[@class=\"btn\"]";
-                case "wait":
-                    return "等待秒数，例：5 / 5s / 2000ms";
-                default:
-                    return "请输入对应的值";
-            }
-        }
+<div class="toast" id="toast"></div>
 
-        function render() {
-            const list = document.getElementById('stepList');
-            list.innerHTML = '';
-            
-            steps.forEach((step, index) => {
-                const item = document.createElement('div');
-                item.className = 'step-item';
-                const ph = getPlaceholder(step.type);
-                item.innerHTML = `
-                    <div class="step-index">${index + 1}</div>
-                    <select class="step-type" onchange="updateType(${index}, this.value)">
-                        <option value="openurl" ${step.type === 'openurl' ? 'selected' : ''}>openurl 打开网址</option>
-                        <option value="click" ${step.type === 'click' ? 'selected' : ''}>click XPath点击</option>
-                        <option value="wait" ${step.type === 'wait' ? 'selected' : ''}>wait 等待延时</option>
-                    </select>
-                    <input type="text" class="step-value" 
-                           value="${step.value.replace(/"/g, '&quot;')}" 
-                           placeholder="${ph}"
-                           onchange="updateValue(${index}, this.value)" >
-                    <div class="step-actions">
-                        <button class="secondary" onclick="moveUp(${index})" ${index === 0 ? 'disabled style="opacity:0.3"' : ''}>上移</button>
-                        <button class="secondary" onclick="moveDown(${index})" ${index === steps.length - 1 ? 'disabled style="opacity:0.3"' : ''}>下移</button>
-                        <button class="danger" onclick="deleteStep(${index})">删除</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-            updateJsonOutput();
+<script>
+(() => {
+  'use strict';
 
-            // 如果标记开启，滚动到最后一条步骤
-            if(shouldScrollToLast){
-                const items = list.querySelectorAll('.step-item');
-                const last = items[items.length -1];
-                if(last){
-                    last.scrollIntoView({behavior:'smooth', block:'end'});
-                }
-                shouldScrollToLast = false; //用完关闭标记
-            }
-        }
-        function updateJsonOutput() {
-            document.getElementById('jsonOutput').value = JSON.stringify(steps, null, 4);
-        }
-        function addStep() {
-            steps.push({ type: "click", value: "" });
-            shouldScrollToLast = true; //标记需要滚动到底部
-            render();
-        }
-        function updateType(index, type) {
-            steps[index].type = type;
-            updateJsonOutput();
-            render(); //切换类型，重新渲染更新placeholder
-        }
-        function updateValue(index, value) {
-            steps[index].value = value;
-            updateJsonOutput();
-        }
-        function moveUp(index) {
-            if (index === 0) return;
-            [steps[index - 1], steps[index]] = [steps[index], steps[index - 1]];
-            render();
-        }
-        function moveDown(index) {
-            if (index === steps.length - 1) return;
-            [steps[index + 1], steps[index]] = [steps[index], steps[index + 1]];
-            render();
-        }
-        function deleteStep(index) {
-            steps.splice(index, 1);
-            render();
-        }
-        function clearAll() {
-            if (confirm('确定清空所有步骤吗？')) {
-                steps = [];
-                render();
-            }
-        }
-        function copyJson() {
-            const textarea = document.getElementById('jsonOutput');
-            textarea.select();
-            document.execCommand('copy');
-            alert('JSON已复制到剪贴板');
-        }
-        function downloadJson() {
-            const blob = new Blob([JSON.stringify(steps, null, 4)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'task.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-        function importJson() {
-            const input = prompt('请粘贴要导入的JSON内容：');
-            if (!input) return;
-            try {
-                const data = JSON.parse(input);
-                if (!Array.isArray(data)) throw new Error('必须是数组格式');
-                if (!data.every(s => s.type && s.value !== undefined)) {
-                    throw new Error('存在格式非法的步骤，必须包含type和value字段');
-                }
-                steps = data;
-                render();
-                alert('导入成功');
-            } catch (e) {
-                alert('导入失败：' + e.message);
-            }
-        }
+  const STORAGE_KEY = 'local_task_json_editor_v1';
 
-        // 页面加载：优先读取同目录 task.json
-        async function initLoadTaskJson() {
-            try {
-                const res = await fetch('./task.json');
-                if (!res.ok) throw new Error('文件不存在或访问失败');
-                const data = await res.json();
-                if (!Array.isArray(data)) throw new Error('task.json不是数组');
-                if (!data.every(s => s.type && s.value !== undefined)) {
-                    throw new Error('task.json字段不完整，需要type、value');
-                }
-                steps = data;
-            } catch(err) {
-                console.log('读取task.json失败，使用默认数据：', err);
-                steps = JSON.parse(JSON.stringify(defaultSteps));
-            }
-            render();
-        }
+  // 来自当前对话中提供的 task.json 示例，转换为推荐的新格式。
+  const SAMPLE = [
+    { type:'openurl', value:'https://rewards.bing.com/dashboard' },
+    { type:'wait', value:10 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/div/button[2]/div/div' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:8 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[3]/div/section/div/div[3]/button' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:5 },
+    { type:'openurl', value:'https://rewards.bing.com/dashboard' },
+    { type:'wait', value:5 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[1]/div' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:8 },
+    { type:'openurl', value:'https://rewards.bing.com/dashboard' },
+    { type:'wait', value:5 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[2]/div' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:8 },
+    { type:'openurl', value:'https://rewards.bing.com/dashboard' },
+    { type:'wait', value:5 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[3]/div' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:8 },
+    { type:'openurl', value:'https://rewards.bing.com/earn' },
+    { type:'wait', value:5 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a/div' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:3 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[1]/div[2]/a/span' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:3 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[2]/div[2]/a/span' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:3 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[3]/div[2]/a/span' }
+      ],
+      timeout:15
+    },
+    { type:'wait', value:3 },
+    {
+      type:'click',
+      locator:[
+        { type:'xpath', value:'/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[4]/div[2]/a/span' }
+      ],
+      timeout:15
+    }
+  ];
 
-        // 初始化
-        initLoadTaskJson();
-    </script>
+  let tasks = [];
+  let editIndex = -1;
+
+  const $ = (id) => document.getElementById(id);
+
+  const els = {
+    list: $('taskList'),
+    status: $('status'),
+    preview: $('preview'),
+    modal: $('modal'),
+    modalTitle: $('modalTitle'),
+    type: $('typeInput'),
+    value: $('valueInput'),
+    valueLabel: $('valueLabel'),
+    valueHelp: $('valueHelp'),
+    valueField: $('valueField'),
+    locatorField: $('locatorField'),
+    locatorList: $('locatorList'),
+    timeoutField: $('timeoutField'),
+    timeout: $('timeoutInput'),
+    note: $('noteInput'),
+    toast: $('toast')
+  };
+
+  function deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function toast(message) {
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => els.toast.classList.remove('show'), 1800);
+  }
+
+  function saveLocal() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    } catch (e) {}
+  }
+
+  function loadLocal() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return false;
+      tasks = parsed;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function updatePreview() {
+    els.preview.value = JSON.stringify(tasks, null, 2);
+    els.status.textContent = `共 ${tasks.length} 个步骤`;
+    saveLocal();
+  }
+
+  function taskSummary(task) {
+    if (task.type === 'openurl') return task.value || '';
+    if (task.type === 'wait') return `${task.value || 0} 秒`;
+    if (task.type === 'click') {
+      const first = (task.locator || [])[0];
+      return first ? `${first.type}: ${first.value}` : '未设置定位器';
+    }
+    return '';
+  }
+
+  function render() {
+    els.list.innerHTML = '';
+
+    if (!tasks.length) {
+      els.list.innerHTML = `
+        <div class="empty">
+          <div style="font-size:28px;margin-bottom:8px">＋</div>
+          暂无步骤<br>
+          <span style="font-size:12px">点击右上角“添加步骤”开始</span>
+        </div>
+      `;
+      updatePreview();
+      return;
+    }
+
+    tasks.forEach((task, index) => {
+      const item = document.createElement('div');
+      item.className = 'task-item';
+      item.draggable = true;
+      item.dataset.index = index;
+
+      item.innerHTML = `
+        <div class="task-head">
+          <div class="drag-handle" title="拖动排序">☷</div>
+          <div class="index-badge">${index + 1}</div>
+          <div class="task-type">${task.type}</div>
+          <div class="task-summary">${escapeHtml(taskSummary(task))}</div>
+          <div class="task-actions">
+            <button class="icon-btn" data-action="up" title="上移">↑</button>
+            <button class="icon-btn" data-action="down" title="下移">↓</button>
+            <button class="icon-btn" data-action="edit" title="编辑">✎</button>
+            <button class="icon-btn danger" data-action="delete" title="删除">×</button>
+          </div>
+        </div>
+        <div class="task-body">
+          ${renderTaskDetail(task)}
+        </div>
+      `;
+
+      item.addEventListener('dragstart', () => {
+        item.classList.add('dragging');
+        item.dataset.dragging = '1';
+      });
+
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        item.dataset.dragging = '';
+        document.querySelectorAll('.task-item').forEach(x => x.classList.remove('drag-over'));
+      });
+
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        item.classList.add('drag-over');
+      });
+
+      item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        item.classList.remove('drag-over');
+
+        const from = Number(document.querySelector('.task-item[data-dragging="1"]')?.dataset.index);
+        const to = Number(item.dataset.index);
+
+        if (!Number.isInteger(from) || !Number.isInteger(to) || from === to) return;
+
+        const [moved] = tasks.splice(from, 1);
+        tasks.splice(to, 0, moved);
+        render();
+        toast('步骤顺序已调整');
+      });
+
+      item.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.dataset.action;
+          if (action === 'up') moveTask(index, -1);
+          if (action === 'down') moveTask(index, 1);
+          if (action === 'edit') openEditor(index);
+          if (action === 'delete') deleteTask(index);
+        });
+      });
+
+      els.list.appendChild(item);
+    });
+
+    updatePreview();
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  function renderTaskDetail(task) {
+    if (task.type === 'openurl') {
+      return `<div><b>网址：</b>${escapeHtml(task.value || '')}</div>`;
+    }
+    if (task.type === 'wait') {
+      return `<div><b>等待：</b>${escapeHtml(task.value || 0)} 秒</div>`;
+    }
+    if (task.type === 'click') {
+      const locators = task.locator || [];
+      return `
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div><b>timeout：</b>${escapeHtml(task.timeout ?? 15)} 秒</div>
+          ${locators.map((l,i) => `
+            <div>
+              <b>定位 ${i+1}：</b>
+              <span style="color:#2563eb">${escapeHtml(l.type)}</span>
+              <span>${escapeHtml(l.value)}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    return '';
+  }
+
+  function moveTask(index, delta) {
+    const target = index + delta;
+    if (target < 0 || target >= tasks.length) return;
+    [tasks[index], tasks[target]] = [tasks[target], tasks[index]];
+    render();
+    toast('步骤顺序已调整');
+  }
+
+  function deleteTask(index) {
+    if (!confirm(`确定删除第 ${index + 1} 步吗？`)) return;
+    tasks.splice(index, 1);
+    render();
+    toast('已删除');
+  }
+
+  function openEditor(index = -1) {
+    editIndex = index;
+    const task = index >= 0 ? deepClone(tasks[index]) : { type:'openurl', value:'' };
+
+    els.type.value = task.type;
+    els.value.value = task.value ?? '';
+    els.timeout.value = task.timeout ?? 15;
+    els.note.value = task.note ?? '';
+    renderModalFields();
+
+    els.locatorList.innerHTML = '';
+
+    if (task.type === 'click') {
+      const arr = Array.isArray(task.locator) && task.locator.length
+        ? task.locator
+        : [{type:'css', value:''}];
+      arr.forEach(l => addLocatorRow(l.type, l.value));
+    }
+
+    els.modalTitle.textContent = index >= 0 ? `编辑第 ${index + 1} 步` : '添加步骤';
+    els.modal.classList.add('show');
+  }
+
+  function closeEditor() {
+    els.modal.classList.remove('show');
+    editIndex = -1;
+  }
+
+  function renderModalFields() {
+    const type = els.type.value;
+
+    els.valueField.style.display = type === 'click' ? 'none' : 'flex';
+    els.locatorField.style.display = type === 'click' ? 'block' : 'none';
+    els.timeoutField.style.display = type === 'click' ? 'flex' : 'none';
+
+    if (type === 'openurl') {
+      els.valueLabel.textContent = '网址';
+      els.value.placeholder = 'https://example.com';
+      els.valueHelp.textContent = '例如：https://rewards.bing.com/dashboard';
+    } else if (type === 'wait') {
+      els.valueLabel.textContent = '等待秒数';
+      els.value.placeholder = '10';
+      els.valueHelp.textContent = '支持整数和小数，例如 3 或 2.5';
+    }
+  }
+
+  function addLocatorRow(type = 'css', value = '') {
+    const row = document.createElement('div');
+    row.className = 'locator-row';
+
+    row.innerHTML = `
+      <div class="locator-top">
+        <select class="select locator-type">
+          <option value="css">css</option>
+          <option value="text">text</option>
+          <option value="xpath">xpath</option>
+        </select>
+        <input class="input locator-value" placeholder="定位表达式">
+        <div class="row-actions">
+          <button class="small-btn up-locator" title="上移">↑</button>
+          <button class="small-btn down-locator" title="下移">↓</button>
+          <button class="small-btn locator-delete" title="删除">×</button>
+        </div>
+      </div>
+    `;
+
+    row.querySelector('.locator-type').value = type;
+    row.querySelector('.locator-value').value = value;
+
+    row.querySelector('.locator-delete').addEventListener('click', () => {
+      row.remove();
+    });
+
+    row.querySelector('.up-locator').addEventListener('click', () => {
+      const prev = row.previousElementSibling;
+      if (prev) row.parentNode.insertBefore(row, prev);
+    });
+
+    row.querySelector('.down-locator').addEventListener('click', () => {
+      const next = row.nextElementSibling;
+      if (next) row.parentNode.insertBefore(next, row);
+    });
+
+    els.locatorList.appendChild(row);
+  }
+
+  function collectModalTask() {
+    const type = els.type.value;
+
+    if (type === 'openurl') {
+      const value = els.value.value.trim();
+      if (!value) throw new Error('请输入网址');
+      return {type:'openurl', value};
+    }
+
+    if (type === 'wait') {
+      const value = Number(els.value.value);
+      if (!Number.isFinite(value) || value < 0) {
+        throw new Error('等待秒数无效');
+      }
+      return {type:'wait', value};
+    }
+
+    if (type === 'click') {
+      const rows = [...els.locatorList.querySelectorAll('.locator-row')];
+      const locator = rows.map(row => ({
+        type: row.querySelector('.locator-type').value,
+        value: row.querySelector('.locator-value').value.trim()
+      })).filter(x => x.value);
+
+      if (!locator.length) throw new Error('至少填写一个定位器');
+
+      const timeout = Number(els.timeout.value);
+      if (!Number.isFinite(timeout) || timeout <= 0) {
+        throw new Error('timeout 无效');
+      }
+
+      return {
+        type:'click',
+        locator,
+        timeout
+      };
+    }
+
+    throw new Error('未知操作类型');
+  }
+
+  function saveEditor() {
+    try {
+      const task = collectModalTask();
+
+      if (els.note.value.trim()) {
+        task.note = els.note.value.trim();
+      }
+
+      if (editIndex >= 0) {
+        tasks[editIndex] = task;
+        toast('已保存修改');
+      } else {
+        tasks.push(task);
+        toast('已添加步骤');
+      }
+
+      closeEditor();
+      render();
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  function newTask() {
+    if (tasks.length && !confirm('确定新建任务吗？当前内容会被清空。')) return;
+    tasks = [];
+    render();
+    toast('已新建');
+  }
+
+  function loadSample() {
+    if (tasks.length && !confirm('确定加载示例并覆盖当前任务吗？')) return;
+    tasks = deepClone(SAMPLE);
+    render();
+    toast('已加载示例');
+  }
+
+  function importJsonFile() {
+    $('fileInput').click();
+  }
+
+  $('fileInput').addEventListener('change', async e => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      if (!Array.isArray(parsed)) {
+        throw new Error('JSON 顶层必须是数组');
+      }
+
+      // 自动兼容旧格式：click.value -> click.locator[xpath]
+      tasks = parsed.map(task => {
+        if (task && task.type === 'click' && !task.locator && typeof task.value === 'string') {
+          const converted = {
+            type:'click',
+            locator:[{type:'xpath', value:task.value}],
+            timeout:task.timeout ?? 15
+          };
+          if (task.note) converted.note = task.note;
+          return converted;
+        }
+        return task;
+      });
+
+      render();
+      toast(`导入成功：${tasks.length} 个步骤`);
+    } catch (err) {
+      alert('导入失败：' + err.message);
+    }
+  });
+
+  function exportJson() {
+    const json = JSON.stringify(tasks, null, 2);
+    const blob = new Blob([json], {type:'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'task.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast('已导出 task.json');
+  }
+
+  async function copyJson() {
+    try {
+      await navigator.clipboard.writeText(els.preview.value);
+      toast('JSON 已复制');
+    } catch (e) {
+      els.preview.select();
+      document.execCommand('copy');
+      toast('JSON 已复制');
+    }
+  }
+
+  // 事件
+  $('addBtn').addEventListener('click', () => openEditor());
+  $('newBtn').addEventListener('click', newTask);
+  $('sampleBtn').addEventListener('click', loadSample);
+  $('importBtn').addEventListener('click', importJsonFile);
+  $('exportBtn').addEventListener('click', exportJson);
+  $('copyBtn').addEventListener('click', copyJson);
+  $('closeModal').addEventListener('click', closeEditor);
+  $('cancelModal').addEventListener('click', closeEditor);
+  $('saveModal').addEventListener('click', saveEditor);
+  $('typeInput').addEventListener('change', () => {
+    renderModalFields();
+    if (els.type.value === 'click' && !els.locatorList.children.length) {
+      addLocatorRow('css', '');
+    }
+  });
+  $('addLocatorBtn').addEventListener('click', () => addLocatorRow('css', ''));
+
+  els.modal.addEventListener('click', e => {
+    if (e.target === els.modal) closeEditor();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeEditor();
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      exportJson();
+    }
+  });
+
+  // 初始化
+  if (!loadLocal()) {
+    tasks = deepClone(SAMPLE);
+  }
+
+  render();
+  renderModalFields();
+})();
+</script>
 </body>
 </html>
