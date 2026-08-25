@@ -1,118 +1,211 @@
 [
-    {
-        "type": "openurl",
-        "value": "https://rewards.bing.com/dashboard"
-    },
-    {
-        "type": "wait",
-        "value": "10"
-    },
-    {
-        "type": "click",
+  {
+    "type": "openurl",
+    "value": "https://rewards.bing.com/dashboard"
+  },
+  {
+    "type": "wait",
+    "value": 10
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "text",
+        "value": "可领取"
+      },
+      {
+        "type": "css",
+        "value": "#react-aria-_R_2hlav5t6bslbH1_ > div"
+      },
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/div/button[2]/div/div"
-    },
-    {
-        "type": "wait",
-        "value": "8"
-    },
-    {
-        "type": "click",
-        "value": "/html/body/div[3]/div/section/div/div[3]/button"
-    },
-    {
-        "type": "wait",
-        "value": "5"
-    },
-    {
-        "type": "openurl",
-        "value": "https://rewards.bing.com/dashboard"
-    },
-    {
-        "type": "wait",
-        "value": "5"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15,
+    "note": "点击今日可领积分"
+  },
+  {
+    "type": "wait",
+    "value": 8
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "text",
+        "value": "领取积分"
+      },
+      {
+        "type": "css",
+        "value": "#react-aria9539895435-_r_2s_ > div > div > div.relative.inline-flex.items-center.justify-center.text-center.transition-colors.duration-faster.ease-linear.after\\:pointer-events-none.after\\:absolute.after\\:inset-0.after\\:border-strokeWidthDefault.bg-bgCtrlBrandRest.text-fgCtrlOnBrandRest.shadow-shadowCtrlBrand.after\\:border-strokeCtrlOnBrandRest.hover\\:bg-bgCtrlBrandHover.hover\\:text-fgCtrlOnBrandHover.hover\\:after\\:border-strokeCtrlOnBrandHover.active\\:bg-bgCtrlBrandPressed.active\\:text-fgCtrlOnBrandPressed.active\\:after\\:border-strokeCtrlOnBrandPressed.data-disabled\\:bg-bgCtrlBrandDisabled.data-disabled\\:text-fgCtrlOnBrandDisabled.data-disabled\\:after\\:border-strokeCtrlOnBrandDisabled.min-h-sizeCtrlLgDefault.min-w-sizeCtrlLgDefault.gap-gapInsideCtrlLgDefault.px-paddingCtrlLgHorizontalDefault.rounded-cornerCtrlLgRest.text-labelButtonLg.after\\:rounded-cornerCtrlLgRest.hover\\:rounded-cornerCtrlLgHover.after\\:hover\\:rounded-cornerCtrlLgHover.active\\:rounded-cornerCtrlLgPressed.after\\:active\\:rounded-cornerCtrlLgPressed"
+      },
+      {
+        "type": "xpath",
+        "value": "/html/body/div[3]/div/section/div/div[2]/div/button/div/div/div[2]"
+      }
+    ],
+    "timeout": 15,
+    "note": "点击领取积分按钮"
+  },
+  {
+    "type": "wait",
+    "value": 5
+  },
+  {
+    "type": "openurl",
+    "value": "https://rewards.bing.com/dashboard"
+  },
+  {
+    "type": "wait",
+    "value": 5
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "css",
+        "value": "#react-aria-_R_4lav5t6bslbH2_ > div > div > a:nth-child(1) > div"
+      },
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[1]/div"
-    },
-    {
-        "type": "wait",
-        "value": "8"
-    },
-    {
-        "type": "openurl",
-        "value": "https://rewards.bing.com/dashboard"
-    },
-    {
-        "type": "wait",
-        "value": "5"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15,
+    "note": "每日任务第一个"
+  },
+  {
+    "type": "wait",
+    "value": 8
+  },
+  {
+    "type": "openurl",
+    "value": "https://rewards.bing.com/dashboard"
+  },
+  {
+    "type": "wait",
+    "value": 5
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "css",
+        "value": "#react-aria-_R_4lav5t6bslbH2_ > div > div > a:nth-child(2) > div"
+      },
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[2]/div"
-    },
-    {
-        "type": "wait",
-        "value": "8"
-    },
-    {
-        "type": "openurl",
-        "value": "https://rewards.bing.com/dashboard"
-    },
-    {
-        "type": "wait",
-        "value": "5"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15,
+    "note": "每日任务第二个"
+  },
+  {
+    "type": "wait",
+    "value": 8
+  },
+  {
+    "type": "openurl",
+    "value": "https://rewards.bing.com/dashboard"
+  },
+  {
+    "type": "wait",
+    "value": 5
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "css",
+        "value": "#react-aria-_R_4lav5t6bslbH2_ > div > div > a:nth-child(3) > div"
+      },
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a[3]/div"
-    },
-    {
-        "type": "wait",
-        "value": "8"
-    },
-    {
-        "type": "openurl",
-        "value": "https://rewards.bing.com/earn"
-    },
-    {
-        "type": "wait",
-        "value": "5"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15,
+    "note": "每日任务第三个"
+  },
+  {
+    "type": "wait",
+    "value": 8
+  },
+  {
+    "type": "openurl",
+    "value": "https://rewards.bing.com/earn"
+  },
+  {
+    "type": "wait",
+    "value": 5
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/section[3]/div/div[2]/div/div/a/div"
-    },
-    {
-        "type": "wait",
-        "value": "3"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15
+  },
+  {
+    "type": "wait",
+    "value": 3
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[1]/div[2]/a/span"
-    },
-    {
-        "type": "wait",
-        "value": "3"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15
+  },
+  {
+    "type": "wait",
+    "value": 3
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[2]/div[2]/a/span"
-    },
-    {
-        "type": "wait",
-        "value": "3"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15
+  },
+  {
+    "type": "wait",
+    "value": 3
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[3]/div[2]/a/span"
-    },
-    {
-        "type": "wait",
-        "value": "3"
-    },
-    {
-        "type": "click",
+      }
+    ],
+    "timeout": 15
+  },
+  {
+    "type": "wait",
+    "value": 3
+  },
+  {
+    "type": "click",
+    "locator": [
+      {
+        "type": "xpath",
         "value": "/html/body/div[2]/div[2]/div/main/div/div[2]/div[2]/div[4]/div[2]/a/span"
-    }
+      }
+    ],
+    "timeout": 15
+  }
 ]
